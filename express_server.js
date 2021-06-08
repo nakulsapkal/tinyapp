@@ -31,7 +31,6 @@ app.get("/u/:shortURL", (req, res) => {
 
 
 app.get("/urls", (req, res) => {
-  //const templateVars = { urls: urlDatabase };
   const templateVars = {
     username: req.cookies["username"],
     urls: urlDatabase
@@ -93,8 +92,6 @@ app.post("/urls/:shortURL/delete", (req, res) => {
 
 app.post('/login', (req, res) => {
 
-  // req.cookies.name = "username";
-  // req.cookies.value = req.body.username;
   res.cookie("username", req.body.username);
 
   res.redirect("/urls");
