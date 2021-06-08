@@ -44,7 +44,11 @@ app.listen(PORT, () => {
 
 
 app.post("/urls", (req, res) => {
-  console.log(req.body);
+  const shortURL = generateRandomString();
+  const longURL = req.body;
+  const urlDatabase = {};
+
+  urlDatabase[shortURL] = longURL.longURL;
   res.send("Ok");
 })
 
