@@ -66,3 +66,11 @@ function generateRandomString() {
   for (var i = 6; i > 0; --i) result += chars[Math.floor(Math.random() * chars.length)];
   return result;
 }
+
+
+
+app.post("/urls/:shortURL/delete", (req, res) => {
+
+  delete urlDatabase[req.params.shortURL];
+  res.redirect("/urls");
+});
