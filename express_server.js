@@ -15,6 +15,14 @@ app.get("/urls/new", (req, res) => {
   res.render("urls_new");
 });
 
+app.get("/u/:shortURL", (req, res) => {
+  const longURL = urlDatabase[req.params.shortURL];
+  if (longURL) {
+    res.redirect(longURL);
+  }
+
+  res.send("URL not found in datbase!");
+})
 
 
 app.get("/urls", (req, res) => {
@@ -49,21 +57,8 @@ app.post("/urls", (req, res) => {
   const longURL = req.body;
 
   urlDatabase[shortURL] = longURL.longURL;
-  console.log(urlDatabase);
   res.redirect(longURL.longURL);
 })
-
-
-app.get("/urls/:shortURL", (req, res) => {
-  const longURL = urlDatabase.longURL
-  res.redirect(longURL);
-});
-
-
-
-
-
-
 
 function generateRandomString() {
   let chars = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
