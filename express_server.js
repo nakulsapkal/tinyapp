@@ -45,10 +45,14 @@ app.listen(PORT, () => {
 
 app.post("/urls", (req, res) => {
   console.log(req.body);
-  res.send("Ok")
+  res.send("Ok");
 })
 
 
-function generateRandomString() {
 
+function generateRandomString() {
+  let chars = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
+  var result = '';
+  for (var i = 6; i > 0; --i) result += chars[Math.floor(Math.random() * chars.length)];
+  return result;
 }
