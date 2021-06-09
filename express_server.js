@@ -19,6 +19,11 @@ const users = {
     email: "user@example.com",
     password: "purple-monkey-dinosaur"
   },
+  "nakSap1": {
+    id: "nakSap1",
+    email: "nakul.sapkal@gmail.com",
+    password: "as"
+  },
   "user2RandomID": {
     id: "user2RandomID",
     email: "user2@example.com",
@@ -35,9 +40,12 @@ app.get("/urls/new", (req, res) => {
 });
 
 app.get("/u/:shortURL", (req, res) => {
-  const longURL = urlDatabase[req.params.shortURL];
+
+  const shortURL = req.params.shortURL
+  const longURL = urlDatabase[shortURL];
+
   if (longURL) {
-    res.redirect(longURL);
+    return res.redirect(longURL);
   }
 
   res.send("URL not found in datbase!");
@@ -53,7 +61,7 @@ app.get("/urls", (req, res) => {
 });
 
 app.get("/urls/:shortURL", (req, res) => {
-  const templateVars = { user_id: req.cookies["user_id"], shortURL: req.params.shortURL, longURL: urlDatabase[req.params.shortURL] };
+  const templateVars = { user_id: users[req.cookies["user_id"]], shortURL: req.params.shortURL, longURL: urlDatabase[req.params.shortURL] };
   res.render("urls_show", templateVars);
 });
 
@@ -80,7 +88,8 @@ app.post("/urls", (req, res) => {
   const longURL = req.body;
 
   urlDatabase[shortURL] = longURL.longURL;
-  res.redirect(longURL.longURL);
+  //res.redirect(longURL.longURL);
+  res.redirect(`/urls/${shortURL}`);
 })
 
 function generateRandomString() {
@@ -179,7 +188,6 @@ app.post("/register", (req, res) => {
 
   res.cookie("user_id", userID);
   res.redirect("/urls");
-
 })
 
 app.get("/login", (req, res) => {
