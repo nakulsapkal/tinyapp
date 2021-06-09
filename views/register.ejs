@@ -8,15 +8,16 @@
 
     <!-- Bootstrap CSS -->
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/css/bootstrap.min.css" integrity="sha384-GJzZqFGwb1QTTN6wy59ffF1BuGJpLSa9DkKMp0DgiMDm4iYMj70gZWKYbI706tWS" crossorigin="anonymous">
-    <title>Login Page</title>
+    <title>Registration</title>
 
 </head>
 
 <body>
     <%- include('partials/_header') %>
+
         <div>
-            <h2>Login</h2><br>
-            <form method="POST" action="/login">
+            <h2>Create Account</h2><br>
+            <form method="POST" action="/register">
                 <label>Email address</label><br>
                 <input name="email" type="email" placeholder="Enter email">
                 <br><br>

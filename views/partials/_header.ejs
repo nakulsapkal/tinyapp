@@ -4,26 +4,23 @@
         <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
 	<span class="navbar-toggler-icon"></span>
 </button>
-        <%if(username){%>
-            <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
-                <div class="navbar-nav">
-                    <a class="nav-item nav-link" href="/urls">My URLs</a>
-                    <a class="nav-item nav-link" href="/urls/new">Create New URL</a>
-                </div>
+        <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
+            <div class="navbar-nav">
+                <a class="nav-item nav-link" href="/urls">My URLs</a>
+                <a class="nav-item nav-link" href="/urls/new">Create New URL</a>
             </div>
-            <div>
+        </div>
+        <div class="navbar-nav">
+            <%if(user_id){%>
                 <form method="POST" action="/logout">
-                    <label>Logged In As: <%= username.email %></label>
+                    <label>Logged In As: <%= user_id.email %></label>
                     <button type="submit">Logout</button>
                 </form>
                 <%}else{%>
-                    <a href="/login">Login</a>
-                    <br>
-                    <a href="/user_registration">Register</a>
+                    <a class="nav-item nav-link" href="/login">Login</a>
+                    <a class="nav-item nav-link" href="/register">Register</a>
                     <%}%>
-            </div>
+        </div>
     </nav>
     <div>
-
-
 </header>
