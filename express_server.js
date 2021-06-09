@@ -112,8 +112,8 @@ app.post("/urls/:shortURL/delete", (req, res) => {
 });
 
 app.post('/login', (req, res) => {
-
-  res.cookie("username", req.body.username);
+  console.log(req.body);
+  res.cookie("username", req.body.email);
 
   res.redirect("/urls");
 
@@ -167,3 +167,7 @@ app.post("/register", (req, res) => {
   res.redirect("/urls");
 
 })
+
+app.get("/login", (req, res) => {
+  res.render("login");
+});
