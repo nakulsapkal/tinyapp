@@ -1,5 +1,6 @@
 const express = require("express");
 const app = express();
+const { generateRandomString, getUserByEmail, getUserByPassword, urlsForUser } = require("./helpers");
 const PORT = 8080; // default port 8080
 const bodyParser = require("body-parser");
 const bcrypt = require('bcrypt');
@@ -35,43 +36,6 @@ const users = {
     password: bcrypt.hashSync("sa", 10)
   }
 };
-
-
-
-function generateRandomString() {
-  let chars = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
-  var result = '';
-  for (var i = 6; i > 0; --i) result += chars[Math.floor(Math.random() * chars.length)];
-  return result;
-}
-
-const getUserByEmail = function(email) {
-  for (let key in users) {
-    if (users[key].email === email) {
-      return true;
-    }
-  }
-  return false;
-}
-
-const getUserByPassword = function(password, email) {
-  for (let key in users) {
-    if ((bcrypt.compareSync(password, users[key].password)) && (users[key].email === email)) {
-      return key;
-    }
-  }
-  return false;
-}
-
-const urlsForUser = function(id) {
-  const userUrls = {};
-  for (key in urlDatabase) {
-    if (urlDatabase[key].userID === id) {
-      userUrls[key] = urlDatabase[key];
-    }
-  }
-  return userUrls;
-}
 
 
 app.get("/", (req, res) => {
@@ -132,7 +96,7 @@ app.post("/urls/:shortURL/delete", (req, res) => {
 
   if (user_id !== undefined) {
     delete urlDatabase[req.params.shortURL];
-    res.redirect("/urls");
+    return res.redirect("/urls");
   }
   res.send('Cannot delete the link without login');
 
@@ -141,7 +105,7 @@ app.post("/urls/:shortURL/delete", (req, res) => {
 
 app.get("/urls", (req, res) => {
   const user_id = users[req.session.user_id];
-  const urls = urlsForUser(req.session.user_id);
+  const urls = urlsForUser(req.session.user_id, urlDatabase);
 
   const templateVars = {
     user_id,
@@ -163,8 +127,8 @@ app.post("/urls", (req, res) => {
 });
 
 
-app.post("/urls/:id", (req, res) => {
-  urlDatabase[req.params.id] = req.body.longURL;
+app.post("/urls/:shortURL", (req, res) => {
+  urlDatabase[req.params.shortURL].longURL = req.body.longURL;
 
   res.redirect("/urls");
 });
@@ -173,11 +137,11 @@ app.post("/urls/:id", (req, res) => {
 app.post('/login', (req, res) => {
   const email = req.body.email;
   const password = req.body.password;
-  const user_id = getUserByPassword(password, email);
+  const user_id = getUserByPassword(password, email, users);
   if (!email || !password) {
     res.statusCode = 403;
     return res.send('Email Id or Password is blank!');
-  } else if (!getUserByEmail(email)) {
+  } else if (!getUserByEmail(email, users)) {
     res.statusCode = 403;
     return res.send('Email Id does not exists!');
   } else if (!user_id) {
@@ -213,7 +177,7 @@ app.post("/register", (req, res) => {
   if (!email || !inputPassword) {
     res.statusCode = 400;
     return res.send('Email Id or Password is blank!');
-  } else if (getUserByEmail(email)) {
+  } else if (getUserByEmail(email, users)) {
     res.statusCode = 400;
     return res.send('Email Id already exists!');
   }
