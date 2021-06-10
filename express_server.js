@@ -2,6 +2,7 @@ const express = require("express");
 const app = express();
 const PORT = 8080; // default port 8080
 const bodyParser = require("body-parser");
+const bcrypt = require('bcrypt');
 app.use(bodyParser.urlencoded({ extended: true }));
 var cookieParser = require('cookie-parser');
 const { name } = require("ejs");
@@ -9,25 +10,20 @@ app.use(cookieParser())
 app.set("view engine", "ejs");
 
 const urlDatabase = {
-  b6UTxQ: { longURL: "https://www.tsn.ca", userID: "aJ48lW" },
+  b6UTxQ: { longURL: "https://www.tsn.ca", userID: "nakSap2" },
   i3BoGr: { longURL: "https://www.google.ca", userID: "nakSap1" }
 };
 
 const users = {
-  "userRandomID": {
-    id: "userRandomID",
-    email: "user@example.com",
-    password: "purple-monkey-dinosaur"
-  },
   "nakSap1": {
     id: "nakSap1",
     email: "nakul.sapkal@gmail.com",
-    password: "as"
+    password: bcrypt.hashSync("as", 10)
   },
-  "user2RandomID": {
-    id: "user2RandomID",
-    email: "user2@example.com",
-    password: "dishwasher-funk"
+  "nakSap2": {
+    id: "nakSap2",
+    email: "nakul.sapkal@yahoo.com",
+    password: bcrypt.hashSync("sa", 10)
   }
 };
 
@@ -49,9 +45,9 @@ const getUserByEmail = function(email) {
   return false;
 }
 
-const getUserByPassword = function(password) {
+const getUserByPassword = function(password, email) {
   for (let key in users) {
-    if (users[key].password === password) {
+    if ((bcrypt.compareSync(password, users[key].password)) && (users[key].email === email)) {
       return key;
     }
   }
@@ -75,7 +71,7 @@ app.get("/", (req, res) => {
 
 
 app.get("/urls.json", (req, res) => {
-  res.json(urlDatabase);
+  res.json(urlDatabase, users);
 });
 
 
@@ -163,12 +159,10 @@ app.post("/urls/:id", (req, res) => {
 });
 
 
-
-
 app.post('/login', (req, res) => {
   const email = req.body.email;
   const password = req.body.password;
-  const user_id = getUserByPassword(password);
+  const user_id = getUserByPassword(password, email);
   if (!email || !password) {
     res.statusCode = 403;
     return res.send('Email Id or Password is blank!');
@@ -204,15 +198,17 @@ app.get("/register", (req, res) => {
 app.post("/register", (req, res) => {
   const userID = generateRandomString();
   const email = req.body.email;
-  const password = req.body.password;
-
-  if (!email || !password) {
+  const inputPassword = req.body.password;
+  if (!email || !inputPassword) {
     res.statusCode = 400;
     return res.send('Email Id or Password is blank!');
   } else if (getUserByEmail(email)) {
     res.statusCode = 400;
     return res.send('Email Id already exists!');
   }
+
+  const password = bcrypt.hashSync(inputPassword, 10);
+  console.log(password);
   const newUser = { userID, email, password };
   users[userID] = newUser;
 
