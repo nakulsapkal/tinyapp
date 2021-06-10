@@ -1,6 +1,6 @@
 const express = require("express");
 const app = express();
-const { generateRandomString, getUserByEmail, getUserByPassword, urlsForUser } = require("./helpers");
+const { generateRandomString, getUserByEmail, getUserByPassword, urlsOfUser } = require("./helpers");
 const PORT = 8080; // default port 8080
 const bodyParser = require("body-parser");
 const bcrypt = require('bcrypt');
@@ -105,7 +105,7 @@ app.post("/urls/:shortURL/delete", (req, res) => {
 
 app.get("/urls", (req, res) => {
   const user_id = users[req.session.user_id];
-  const urls = urlsForUser(req.session.user_id, urlDatabase);
+  const urls = urlsOfUser(req.session.user_id, urlDatabase);
 
   const templateVars = {
     user_id,
