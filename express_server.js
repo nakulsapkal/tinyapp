@@ -58,6 +58,15 @@ const getUserByPassword = function(password) {
   return false;
 }
 
+const urlsForUser = function(id) {
+  const userUrls = {};
+  for (key in urlDatabase) {
+    if (urlDatabase[key].userID === id) {
+      userUrls[key] = urlDatabase[key];
+    }
+  }
+  return userUrls;
+}
 
 
 app.get("/", (req, res) => {
@@ -108,15 +117,29 @@ app.get("/u/:shortURL", (req, res) => {
   }
 
   res.send("URL not found in datbase!");
-})
+});
+
+
+app.post("/urls/:shortURL/delete", (req, res) => {
+  const user_id = req.cookies["user_id"];
+
+  if (user_id !== undefined) {
+    delete urlDatabase[req.params.shortURL];
+    res.redirect("/urls");
+  }
+  res.send('Cannot delete the link without login');
+
+});
 
 
 app.get("/urls", (req, res) => {
-  const templateVars = {
-    user_id: users[req.cookies["user_id"]],
-    urls: urlDatabase
-  };
+  const user_id = users[req.cookies["user_id"]];
+  const urls = urlsForUser(req.cookies["user_id"]);
 
+  const templateVars = {
+    user_id,
+    urls
+  };
   res.render("urls_index", templateVars);
 });
 
@@ -140,10 +163,6 @@ app.post("/urls/:id", (req, res) => {
 });
 
 
-app.post("/urls/:shortURL/delete", (req, res) => {
-  delete urlDatabase[req.params.shortURL];
-  res.redirect("/urls");
-});
 
 
 app.post('/login', (req, res) => {
