@@ -24,16 +24,17 @@ const users = {
   "nakSap1": {
     id: "nakSap1",
     email: "nakul.sapkal@gmail.com",
-    password: bcrypt.hashSync("as", 10)
+    password: bcrypt.hashSync("pass", 10)
   },
   "nakSap2": {
     id: "nakSap2",
     email: "nakul.sapkal@yahoo.com",
-    password: bcrypt.hashSync("sa", 10)
+    password: bcrypt.hashSync("word", 10)
   }
 };
 
 
+//Basic routes
 app.get("/", (req, res) => {
   res.send("Hello!");
 });
@@ -72,7 +73,11 @@ app.get("/urls/new", (req, res) => {
 
 // CRUD operation - Read
 app.get("/urls/:shortURL", (req, res) => {
-  const templateVars = { user_id: users[req.session.user_id], shortURL: req.params.shortURL, longURL: urlDatabase[req.params.shortURL].longURL };
+  const templateVars = {
+    user_id: users[req.session.user_id],
+    shortURL: req.params.shortURL,
+    longURL: urlDatabase[req.params.shortURL].longURL
+  };
   res.render("urls_show", templateVars);
 });
 
