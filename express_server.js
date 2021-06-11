@@ -1,20 +1,16 @@
 const express = require("express");
 const app = express();
 const { generateRandomString, getUserByEmail, getUserByPassword, urlsOfUser } = require("./helpers");
-const PORT = 8080; // default port 8080
+const PORT = 8080;
 const bodyParser = require("body-parser");
 const bcrypt = require('bcrypt');
 app.use(bodyParser.urlencoded({ extended: true }));
-//var cookieParser = require('cookie-parser');
 var cookieSession = require('cookie-session')
 const { name } = require("ejs");
-//app.use(cookieParser())
 app.use(cookieSession({
   name: 'session',
   keys: ['key1', 'key2'],
-
-  // Cookie Options
-  maxAge: 24 * 60 * 60 * 1000 // 24 hours
+  maxAge: 24 * 60 * 60 * 1000
 }));
 
 app.set("view engine", "ejs");
@@ -58,9 +54,11 @@ app.listen(PORT, () => {
 });
 
 
+// CRUD operations
+
+// CRUD operation - Read
 app.get("/urls/new", (req, res) => {
   const templateVars = {
-    //user_id: users[req.session["user_id"]]
     user_id: users[req.session.user_id]
   };
 
@@ -72,37 +70,52 @@ app.get("/urls/new", (req, res) => {
 });
 
 
+// CRUD operation - Read
 app.get("/urls/:shortURL", (req, res) => {
-  // const templateVars = { user_id: users[req.session["user_id"]], shortURL: req.params.shortURL, longURL: urlDatabase[req.params.shortURL].longURL };
   const templateVars = { user_id: users[req.session.user_id], shortURL: req.params.shortURL, longURL: urlDatabase[req.params.shortURL].longURL };
   res.render("urls_show", templateVars);
 });
 
 
+// CRUD operation - Create/Edit
+app.post("/urls/:shortURL", (req, res) => {
+
+  const user_id = req.session.user_id;
+
+  if (user_id === undefined) {
+    return res.status(403).send('Sorry, you are not allowed to edit this link!');
+  }
+  urlDatabase[req.params.shortURL].longURL = req.body.longURL;
+  res.redirect("/urls");
+});
+
+
+// CRUD operation - Read
 app.get("/u/:shortURL", (req, res) => {
-  const shortURL = req.params.shortURL
+  const shortURL = req.params.shortURL;
   const newlongURL = urlDatabase[shortURL].longURL;
 
   if (newlongURL) {
     return res.redirect(newlongURL);
   }
-
-  res.send("URL not found in datbase!");
+  res.status(404).send('url not found!');
 });
 
 
+// CRUD operation - Delete
 app.post("/urls/:shortURL/delete", (req, res) => {
   const user_id = req.session.user_id;
 
-  if (user_id !== undefined) {
-    delete urlDatabase[req.params.shortURL];
-    return res.redirect("/urls");
+  if (user_id === undefined) {
+    return res.status(403).send('Sorry, you are not allowed to delete this link!');
   }
-  res.send('Cannot delete the link without login');
 
+  delete urlDatabase[req.params.shortURL];
+  return res.redirect("/urls");
 });
 
 
+// CRUD operation - Read
 app.get("/urls", (req, res) => {
   const user_id = users[req.session.user_id];
   const urls = urlsOfUser(req.session.user_id, urlDatabase);
@@ -127,33 +140,27 @@ app.post("/urls", (req, res) => {
 });
 
 
-app.post("/urls/:shortURL", (req, res) => {
-  urlDatabase[req.params.shortURL].longURL = req.body.longURL;
-
-  res.redirect("/urls");
-});
-
-
+// Authentication
+//Login Route Check/Validate
 app.post('/login', (req, res) => {
   const email = req.body.email;
   const password = req.body.password;
   const user_id = getUserByPassword(password, email, users);
-  if (!email || !password) {
-    res.statusCode = 403;
-    return res.send('Email Id or Password is blank!');
+  if (!email) {
+    return res.status(401).send('EmailId is  black!');
+  } else if (!password) {
+    return res.status(401).send('Password is  black!');
   } else if (!getUserByEmail(email, users)) {
-    res.statusCode = 403;
-    return res.send('Email Id does not exists!');
+    return res.status(401).send('Sorry, the user is not registered!');
   } else if (!user_id) {
-    res.statusCode = 403;
-    return res.send('Email ID or Password does not match!');
+    return res.status(401).send('Wrong credentials!');
   }
 
   req.session.user_id = user_id;
   res.redirect("/urls");
 });
 
-
+//Login Route Read
 app.get("/login", (req, res) => {
   const templateVars = {
     user_id: users[req.session.user_id]
@@ -161,7 +168,7 @@ app.get("/login", (req, res) => {
   res.render("login", templateVars);
 });
 
-
+//Register Route Read
 app.get("/register", (req, res) => {
   const templateVars = {
     user_id: users[req.session.user_id]
@@ -170,16 +177,15 @@ app.get("/register", (req, res) => {
 });
 
 
+//Register Route Validate/Register
 app.post("/register", (req, res) => {
   const userID = generateRandomString();
   const email = req.body.email;
   const inputPassword = req.body.password;
   if (!email || !inputPassword) {
-    res.statusCode = 400;
-    return res.send('Email Id or Password is blank!');
+    return res.status(403).send('Please insert all mandatory credential!');
   } else if (getUserByEmail(email, users)) {
-    res.statusCode = 400;
-    return res.send('Email Id already exists!');
+    return res.status(403).send('Sorry, the user is already registered');
   }
 
   const password = bcrypt.hashSync(inputPassword, 10);
@@ -190,7 +196,7 @@ app.post("/register", (req, res) => {
   res.redirect("/urls");
 });
 
-
+//Logout Route 
 app.post('/logout', (req, res) => {
 
   req.session = null;

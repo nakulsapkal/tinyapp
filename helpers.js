@@ -1,6 +1,6 @@
 const bcrypt = require('bcrypt');
 
-
+//This functions helps generating random unique string 
 const generateRandomString = function() {
   let chars = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
   var result = '';
@@ -8,6 +8,7 @@ const generateRandomString = function() {
   return result;
 }
 
+//This functions help in verifying the user using the emailId provided. 
 const getUserByEmail = function(email, userDatabase) {
   for (let key in userDatabase) {
     if (userDatabase[key].email === email) {
@@ -17,6 +18,7 @@ const getUserByEmail = function(email, userDatabase) {
   return false;
 }
 
+//This functions help in verifying the user using the emailId provided and if the password matches to that emailID. 
 const getUserByPassword = function(password, email, userDatabase) {
   for (let key in userDatabase) {
     if ((bcrypt.compareSync(password, userDatabase[key].password)) && (userDatabase[key].email === email)) {
@@ -26,6 +28,8 @@ const getUserByPassword = function(password, email, userDatabase) {
   return false;
 }
 
+
+//This functions helps to get back the objcet of user to know its user created url's 
 const urlsOfUser = function(id, userUrlDatabase) {
   const userUrls = {};
   for (key in userUrlDatabase) {
