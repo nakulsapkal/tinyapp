@@ -121,6 +121,8 @@ app.post("/urls/:shortURL/delete", (req, res) => {
 
   if (user_id === undefined) {
     return res.status(403).send('Sorry, you are not allowed to delete this link!');
+  } else if (user_id !== urlDatabase[req.params.shortURL].userID) {
+    return res.status(403).send('Sorry, you do not have access to this URL!');
   }
 
   delete urlDatabase[req.params.shortURL];
@@ -131,6 +133,10 @@ app.post("/urls/:shortURL/delete", (req, res) => {
 // CRUD operation - Read
 app.get("/urls", (req, res) => {
   const user_id = users[req.session.user_id];
+
+  if (user_id === undefined) {
+    return res.status(403).send('Please login or register to visit the URL page.');
+  }
   const urls = urlsOfUser(req.session.user_id, urlDatabase);
 
   const templateVars = {
