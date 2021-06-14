@@ -91,7 +91,7 @@ app.post("/urls/:shortURL", (req, res) => {
   const user_id = req.session.user_id;
 
   if (user_id === undefined) {
-    return res.status(403).send('Sorry, you are not allowed to edit this link!');
+    return res.status(403).send('Sorry, you are not the owner of this link!');
   }
   urlDatabase[req.params.shortURL].longURL = req.body.longURL;
   res.redirect("/urls");
@@ -103,7 +103,7 @@ app.get("/u/:shortURL", (req, res) => {
   const shortURL = req.params.shortURL;
 
   if (!urlDatabase[shortURL]) {
-    return res.status(403).send('Sorry, request URL is not found!');
+    return res.status(404).send('URL not found!');
   }
 
   const newlongURL = urlDatabase[shortURL].longURL;
@@ -157,7 +157,7 @@ app.post("/urls", (req, res) => {
   }
 
   if (userID === undefined) {
-    return res.status(403).send('Please login or register to create new URL page.');
+    return res.status(403).send('Please login or register to create new URL.');
   }
 
   res.redirect(`/urls/${shortURL}`);
