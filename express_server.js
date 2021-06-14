@@ -155,11 +155,29 @@ app.post("/urls", (req, res) => {
     longURL,
     userID
   }
+
+  if (userID === undefined) {
+    return res.status(403).send('Please login or register to create new URL page.');
+  }
+
   res.redirect(`/urls/${shortURL}`);
 });
 
 
 // Authentication
+//Login Route Read
+app.get("/login", (req, res) => {
+  const templateVars = {
+    user_id: users[req.session.user_id]
+  };
+
+  if (req.session.isNew) {
+    return res.render("login", templateVars);
+  }
+
+  res.redirect("/urls");
+});
+
 //Login Route Check/Validate
 app.post('/login', (req, res) => {
   const email = req.body.email;
@@ -179,20 +197,18 @@ app.post('/login', (req, res) => {
   res.redirect("/urls");
 });
 
-//Login Route Read
-app.get("/login", (req, res) => {
-  const templateVars = {
-    user_id: users[req.session.user_id]
-  };
-  res.render("login", templateVars);
-});
 
 //Register Route Read
 app.get("/register", (req, res) => {
   const templateVars = {
     user_id: users[req.session.user_id]
   };
-  res.render("register", templateVars);
+
+  if (req.session.isNew) {
+    return res.render("register", templateVars);
+  }
+
+  res.redirect("/urls");
 });
 
 
