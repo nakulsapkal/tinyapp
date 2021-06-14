@@ -67,6 +67,15 @@ app.get("/urls/new", (req, res) => {
 
 // CRUD operation - Read
 app.get("/urls/:shortURL", (req, res) => {
+
+  if (req.session.user_id === undefined) {
+    return res.status(403).send('Please login or register to visit following URL.');
+  } else if (!urlDatabase[req.params.shortURL]) {
+    return res.status(403).send('Sorry, request URL not found!');
+  } else if (req.session.user_id !== urlDatabase[req.params.shortURL].userID) {
+    return res.status(403).send('Sorry, you do not have access to this URL!');
+  }
+
   const templateVars = {
     user_id: users[req.session.user_id],
     shortURL: req.params.shortURL,
