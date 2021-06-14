@@ -3,8 +3,8 @@ const bcrypt = require('bcrypt');
 //This functions helps generating random unique string 
 const generateRandomString = function() {
   let chars = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
-  var result = '';
-  for (var i = 6; i > 0; --i) result += chars[Math.floor(Math.random() * chars.length)];
+  let result = '';
+  for (let i = 6; i > 0; --i) result += chars[Math.floor(Math.random() * chars.length)];
   return result;
 }
 
