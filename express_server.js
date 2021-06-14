@@ -101,6 +101,11 @@ app.post("/urls/:shortURL", (req, res) => {
 // CRUD operation - Read
 app.get("/u/:shortURL", (req, res) => {
   const shortURL = req.params.shortURL;
+
+  if (!urlDatabase[shortURL]) {
+    return res.status(403).send('Sorry, request URL is not found!');
+  }
+
   const newlongURL = urlDatabase[shortURL].longURL;
 
   if (newlongURL) {
