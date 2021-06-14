@@ -36,17 +36,11 @@ const users = {
 
 //Basic routes
 app.get("/", (req, res) => {
-  res.send("Hello!");
-});
-
-
-app.get("/urls.json", (req, res) => {
-  res.json(urlDatabase, users);
-});
-
-
-app.get("/hello", (req, res) => {
-  res.send("<html><body>Hello <b>World</b></body></html>\n");
+  if (req.session.user_id !== undefined) {
+    res.redirect("/urls");
+  } else {
+    res.redirect("/login");
+  }
 });
 
 
